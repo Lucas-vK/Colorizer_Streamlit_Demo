@@ -1,7 +1,6 @@
 import colorizer_helper as ch
 import streamlit as st
 
-
 st.set_option('deprecation.showPyplotGlobalUse', False)
 
 
