@@ -21,6 +21,6 @@ if mode == comparison:
         st.pyplot(ch.compare(st.session_state.image_id))
 
 elif mode == examples:
-    st.pyplot(ch.generate_examples())
+    st.pyplot(ch.generate_examples(5, 8))
 
 st.button("Reload")
