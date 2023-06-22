@@ -23,6 +23,25 @@ def get_colorizer():
     return col
 
 
+@st.cache_resource
+def get_categories_df():
+    df = pd.read_csv(CATEGORIES_PATH)
+    return df
+
+
+def get_category_name(image_id: int):
+    image_path = IMAGE_PATHS[image_id]
+    category_id = os.path.basename(image_path).split('_')[0]
+    df = get_categories_df()
+    
+    category = df[df.kaggle_folder == category_id]
+    if category.empty:
+        category_name = "Unknown"
+    else:
+        category_name = category['class'].values[0]
+    
+    return category_name
+
 def get_number_of_images():
     return len(IMAGE_PATHS)
 
@@ -42,7 +61,7 @@ def display_images(image_list: list, rows: int = 1, cols: int = 1, titles: list 
     :param image_list: List of images.
     :param rows: Number of rows the grid should have.
     :param cols: Number of columns the grid should have.
-    :param titles: List of titles for the images.
+    :param titles: List of titles to be displayed above the images.
     """
 
     max_images = rows * cols
@@ -68,8 +87,11 @@ def compare(image_id = None):
     """
     if image_id == None or image_id > len(IMAGE_PATHS) - 1 or image_id < 0:
         image_id = random.randint(0, get_number_of_images() - 1)
+    
+    category_name = get_category_name(image_id)
     colorized_image = get_colorizer().colorize(IMAGE_PATHS[image_id])
-    return display_images([get_gs_image(image_id), colorized_image, get_image(image_id)], 1, 3, [f"Input (ID: {image_id})", "Output", "Original"])
+
+    return display_images([get_gs_image(image_id), colorized_image, get_image(image_id)], 1, 3, [f"Input ({category_name})", "Output", f"Original (ID: {image_id})"])
 
 
 def generate_examples(rows: int = 3, cols: int = 5):
@@ -85,7 +107,9 @@ def generate_examples(rows: int = 3, cols: int = 5):
     for i in range(rows * cols):
         image_id = random.randint(0, get_number_of_images() - 1)
         if not any([image_id == id for id in example_ids]):
-            example_ids.append(f"ID: {image_id}")
+            category_name = get_category_name(image_id)
+            #example_ids.append(f"ID: {image_id}\n({category_name})")
+            example_ids.append(f"{category_name}\nID: {image_id}")
             colorized_image = get_colorizer().colorize(IMAGE_PATHS[image_id])
             colorized_examples.append(colorized_image)
 
