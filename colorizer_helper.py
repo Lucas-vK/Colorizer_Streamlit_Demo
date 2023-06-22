@@ -2,17 +2,25 @@ from colorizer import load_image, Colorizer#, Decoder
 import os
 import matplotlib.pyplot as plt
 import random
+import pandas as pd
+import streamlit as st
 
 
 
-IMAGE_DIR = ".\\test_images\\color"
-GS_IMAGE_DIR = ".\\test_images\\grayscale"
+
+BASE_PATH = os.path.relpath(os.path.dirname(__file__))
+IMAGE_DIR = os.path.join(BASE_PATH, "test_images/color")
+GS_IMAGE_DIR = os.path.join(BASE_PATH, "test_images/grayscale")
+CATEGORIES_PATH = os.path.join(BASE_PATH, "test_images/grayscale")
+
 IMAGE_PATHS = [os.path.join(IMAGE_DIR, image_path) for image_path in os.listdir(IMAGE_DIR)]
 GS_IMAGE_PATHS = [os.path.join(GS_IMAGE_DIR, gs_image_path) for gs_image_path in os.listdir(GS_IMAGE_DIR)]
 
-col = Colorizer()
 
-#7309
+@st.cache_resource
+def get_colorizer():
+    col = Colorizer()
+    return col
 
 
 def get_number_of_images():
@@ -60,7 +68,7 @@ def compare(image_id = None):
     """
     if image_id == None or image_id > len(IMAGE_PATHS) - 1 or image_id < 0:
         image_id = random.randint(0, get_number_of_images() - 1)
-    colorized_image = col.colorize(IMAGE_PATHS[image_id])
+    colorized_image = get_colorizer().colorize(IMAGE_PATHS[image_id])
     return display_images([get_gs_image(image_id), colorized_image, get_image(image_id)], 1, 3, [f"Input (ID: {image_id})", "Output", "Original"])
 
 
@@ -78,7 +86,7 @@ def generate_examples(rows: int = 3, cols: int = 5):
         image_id = random.randint(0, get_number_of_images() - 1)
         if not any([image_id == id for id in example_ids]):
             example_ids.append(f"ID: {image_id}")
-            colorized_image = col.colorize(IMAGE_PATHS[image_id])
+            colorized_image = get_colorizer().colorize(IMAGE_PATHS[image_id])
             colorized_examples.append(colorized_image)
 
     return display_images(colorized_examples, rows, cols, example_ids)
