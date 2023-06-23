@@ -11,7 +11,7 @@ import streamlit as st
 BASE_PATH = os.path.relpath(os.path.dirname(__file__))
 IMAGE_DIR = os.path.join(BASE_PATH, "test_images/color")
 GS_IMAGE_DIR = os.path.join(BASE_PATH, "test_images/grayscale")
-CATEGORIES_PATH = os.path.join(BASE_PATH, "test_images/grayscale")
+CATEGORIES_PATH = os.path.join(BASE_PATH, "imagenet_kaggle_folders.csv")
 
 IMAGE_PATHS = [os.path.join(IMAGE_DIR, image_path) for image_path in os.listdir(IMAGE_DIR)]
 GS_IMAGE_PATHS = [os.path.join(GS_IMAGE_DIR, gs_image_path) for gs_image_path in os.listdir(GS_IMAGE_DIR)]
@@ -26,6 +26,7 @@ def get_colorizer():
 @st.cache_resource
 def get_categories_df():
     df = pd.read_csv(CATEGORIES_PATH)
+    print(df)
     return df
 
 
